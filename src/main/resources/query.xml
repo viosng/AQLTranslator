@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+<!--<query>
+    <operation>
+        <name>filter</name>
+        <paramaters>
+            <expression>$f1.id &gt; 1</expression>
+            <var>$f1</var>
+        </paramaters>
+    </operation>
+    <arguments>
+        <query>
+            <operation>
+                <name>filter</name>
+                <paramaters>
+                    <expression>$f2.id &lt; 10</expression>
+                    <var>$f2</var>
+                </paramaters>
+            </operation>
+            <arguments>
+                <query>
+                    <operation>
+                        <name>filter</name>
+                        <paramaters>
+                            <expression>$f3.age = 31</expression>
+                            <var>$f3</var>
+                        </paramaters>
+                    </operation>
+                    <arguments>
+                        <query>
+                            <operation>
+                                <name>data</name>
+                                <paramaters>
+                                    <source>Employees</source>
+                                    <var>$f4</var>
+                                </paramaters>
+                            </operation>
+                        </query>
+                    </arguments>
+                </query>
+            </arguments>
+        </query>
+    </arguments>
+</query>-->
+
+<query>
+    <operation>
+        <name>project</name>
+        <paramaters>
+            <var>$f6</var>
+            <select>
+                <field>
+                    <name>Age</name>
+                    <alias>age</alias>
+                </field>
+                <field>
+                    <name>employee_id</name>
+                    <alias>id</alias>
+                </field>
+            </select>
+        </paramaters>
+    </operation>
+    <arguments>
+        <query>
+            <operation>
+                <name>filter</name>
+                <paramaters>
+                    <expression>$f5.Name = "John"</expression>
+                    <var>$f5</var>
+                </paramaters>
+            </operation>
+            <arguments>
+                <query>
+                    <operation>
+                        <name>filter</name>
+                        <paramaters>
+                            <expression>$f4.Age = 31</expression>
+                            <var>$f4</var>
+                        </paramaters>
+                    </operation>
+                    <arguments>
+                        <query>
+                            <operation>
+                                <name>join</name>
+                                <paramaters>
+                                    <var1>$f3</var1>
+                                    <var2>$f2</var2>
+                                    <expression>$f3.id = $f2.dep_id</expression>
+                                </paramaters>
+                            </operation>
+                            <arguments>
+                                <query>
+                                    <operation>
+                                        <name>data</name>
+                                        <paramaters>
+                                            <source>Departments</source>
+                                        </paramaters>
+                                    </operation>
+                                </query>
+                                <query>
+                                    <operation>
+                                        <name>project</name>
+                                        <paramaters>
+                                            <var>$f1</var>
+                                            <select>
+                                                <field>
+                                                    <name>department_id</name>
+                                                    <alias>dep_id</alias>
+                                                </field>
+                                                <field>
+                                                    <name>id</name>
+                                                    <alias>employee_id</alias>
+                                                </field>
+                                                <field>
+                                                    <name>name</name>
+                                                    <alias>Name</alias>
+                                                </field>
+                                                <field>
+                                                    <name>age</name>
+                                                    <alias>Age</alias>
+                                                </field>
+                                            </select>
+                                        </paramaters>
+                                    </operation>
+                                    <arguments>
+                                        <query>
+                                            <operation>
+                                                <name>data</name>
+                                                <paramaters>
+                                                    <source>Employees</source>
+                                                    <var>$f4</var>
+                                                </paramaters>
+                                            </operation>
+                                        </query>
+                                    </arguments>
+                                </query>
+                            </arguments>
+                        </query>
+                    </arguments>
+                </query>
+            </arguments>
+        </query>
+    </arguments>
+</query>
+
+<!--
+{       "DataverseName": "Company",
+        "DatatypeName": "Employee",
+        "Derived": { "Tag": "RECORD",
+                    "IsAnonymous": false,
+                    "EnumValues": null,
+                    "Record": { "IsOpen": true,
+                                "Fields": [ { "FieldName": "id", "FieldType": "int32" },
+                                            { "FieldName": "name", "FieldType": "string" },
+                                            { "FieldName": "age", "FieldType": "int32" },
+                                            { "FieldName": "department_id", "FieldType": "int32" } ]
+                            },
+                    "Union": null,
+                    "UnorderedList": null,
+                    "OrderedList": null
+                    },
+        "Timestamp": "Tue Nov 26 21:47:39 MSK 2013"
+}-->

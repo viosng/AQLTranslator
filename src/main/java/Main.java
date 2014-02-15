@@ -1,10 +1,11 @@
-import queries.impl.ArithmeticExpression;
-import queries.impl.DatasetExpression;
-import queries.impl.FLWORExpression;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import parser.AQLSyntaxTree;
+import parser.XMLParser;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class Main {
 
     private static final String USER_AGENT = "Mozilla/5.0";
 
-    private static List<String> postResponse(String query) throws Exception {
+    private static String postResponse(String query) throws Exception {
         //query = query.replace('\n', ' ').replaceAll(" ", "%20");
         //String url = "http://192.168.0.39:19002/query?query=" + query;
         URL obj = new URL("http://192.168.0.39:19001/");
@@ -52,19 +53,19 @@ public class Main {
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
         String inputLine;
-        List<String> response = new ArrayList<String>();
+        StringBuilder response = new StringBuilder();
 
         while ((inputLine = in.readLine()) != null) {
-            response.add(inputLine);
+            response.append(inputLine);
         }
         in.close();
 
-        return response;
+        return response.toString();
     }
 
-    private static List<String> getResponse(String query) throws Exception {
+    public static List<String> getResponse(String query) throws Exception {
         query = query.replace('\n', ' ').replaceAll(" ", "%20");
-        String url = "http://192.168.0.39:19002/query?query=" + query;
+        String url = "http://192.168.1.172:19002/query?query=" + query;
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
@@ -91,19 +92,37 @@ public class Main {
         return response;
     }
 
+    public static InputStream getResponseStream(String query) throws Exception {
+        query = query.replace('\n', ' ').replaceAll(" ", "%20");
+        String url = "http://192.168.1.172:19002/query?query=" + query;
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+        // optional default is GET
+        con.setRequestMethod("GET");
+
+        //add request header
+        con.setRequestProperty("User-Agent", USER_AGENT);
+
+        int responseCode = con.getResponseCode();
+        System.out.println("\nSending 'GET' request to URL : " + url);
+        System.out.println("Response Code : " + responseCode);
+
+        return con.getInputStream();
+    }
+
     public static void main(String[] args) throws Exception {
-        FLWORExpression f = new FLWORExpression()
-                .from(new FLWORExpression()
-                        .from(new FLWORExpression()
-                                .from(new DatasetExpression("Employees"))
-                                .where(new ArithmeticExpression("$this.id < 10")))
-                        .where(new ArithmeticExpression("$this.id > 1")))
-                .where(new ArithmeticExpression("$this.age = 31"));
-        String query = "use dataverse Company;\n" + f.translate();
+        File fXmlFile = new File("src/main/resources/query.xml");
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        Document doc = dBuilder.parse(fXmlFile);
+
+        doc.getDocumentElement().normalize();
+
+        AQLSyntaxTree tree = new AQLSyntaxTree((Element)doc.getDocumentElement());
+
+        String query = "use dataverse Company;\n" + tree.translate();
         System.out.println(query);
-        List<String> response = getResponse(query);
-        for(String s:response){
-            System.out.println(s);
-        }
+        //System.out.println(getResponse(query.replaceAll("\\t", "")));
     }
 }
