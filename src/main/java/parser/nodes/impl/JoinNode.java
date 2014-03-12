@@ -1,29 +1,32 @@
-    package parser.nodes.impl;
+package parser.nodes.impl;
 
-import parser.nodes.ContainerNode;
+import parser.expressions.ArithmeticNode;
+import parser.nodes.Node;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
  * User: saveln
- * Date: 09.02.14
- * Time: 13:45
+ * Date: 03.03.14
+ * Time: 9:22
  */
-public class JoinNode extends ContainerNode {
-    protected String leftVar, rightVar;
-    protected ContainerNode left, right;
+public class JoinNode extends Node {
+    private Node nestedFor;
     protected ArithmeticNode where;
 
-    public JoinNode(String leftVar, String rightVar, ContainerNode left, ContainerNode right, ArithmeticNode where) {
-        this.leftVar = leftVar;
-        this.rightVar = rightVar;
-        this.left = left;
-        this.right = right;
+    private static List<String> mergeLists(List<String> first, List<String> second) {
+        List<String> fields = new LinkedList<String>(first);
+        fields.addAll(second);
+        return fields;
+    }
+
+    public JoinNode(Node from, Node nestedFor, ArithmeticNode where) {
+        super(from, mergeLists(from.getFieldNames(), nestedFor.getFieldNames()));
+        this.nestedFor = new Node(nestedFor);
         this.where = where;
-        this.fieldNames = new LinkedList<String>(left.getFieldNames());
-        this.fieldNames.addAll(right.getFieldNames());
     }
 
     @Override
@@ -32,30 +35,42 @@ public class JoinNode extends ContainerNode {
         String shift = shiftRight();
 
         // make first loop
-        res.append(String.format("\n%sfor %s in ", shift, leftVar));
-        left.setLevel(this.getLevel() + 1);
-        res.append(left.translate());
+        res.append(String.format("\n%sfor %s in ", shift, getVar()));
+        getFrom().setLevel(this.getLevel() + 1);
+        res.append(getFrom().translate());
 
         // make second loop
-        res.append(String.format("\n%s\tfor %s in ", shift, rightVar));
-        right.setLevel(this.getLevel() + 2);
-        res.append(right.translate());
+        //res.append(String.format("\n%s\tfor %s in ", shift, nestedFor.getVar()));
+        nestedFor.setLevel(this.getLevel() + 1);
+        res.append(nestedFor.translate());
 
         // make where statement
         res.append(String.format("\n%s\twhere %s", shift, where.translate()));
 
         // make return statement with combining field lists of two arguments
         res.append(String.format("\n%sreturn {\n\t", shift));
-        for (Iterator<String> iter = left.getFieldNames().iterator(); iter.hasNext();) {
+        for (Iterator<String> iter = getFrom().getFieldNames().iterator(); iter.hasNext();) {
             String field = iter.next();
-            res.append(String.format("%s\"%s\":%s.%s,\n\t", shift, field, leftVar, field));
+            res.append(String.format("%s\"%s\":%s.%s,\n\t", shift, field, getVar(), field));
         }
 
-        for (Iterator<String> iter = right.getFieldNames().iterator(); iter.hasNext();) {
+        for (Iterator<String> iter = nestedFor.getFieldNames().iterator(); iter.hasNext();) {
             String field = iter.next();
-            res.append(String.format("%s\"%s\":%s.%s", shift, field, rightVar, field));
+            res.append(String.format("%s\"%s\":%s.%s", shift, field, nestedFor.getVar(), field));
             res.append(iter.hasNext() ? ",\n\t" : String.format("\n%s}", shift));
         }
         return res.toString();
+    }
+
+    @Override
+    public String toString() {
+        return "JoinNode{" +
+                "level=" + getLevel() +
+                ", var='" + getVar() + '\'' +
+                ", from=" + getFrom() +
+                ", fieldNames=" + getFieldNames() +
+                ", nestedFor=" + nestedFor +
+                ", where=" + where +
+                '}';
     }
 }

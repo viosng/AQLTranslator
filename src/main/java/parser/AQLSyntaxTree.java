@@ -2,9 +2,13 @@ package parser;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import parser.nodes.ContainerNode;
+import parser.nodes.impl.ContainerNode;
 import parser.nodes.Node;
-import parser.nodes.impl.*;
+import parser.expressions.ArithmeticNode;
+import parser.nodes.impl.DatasetNode;
+import parser.nodes.impl.FilterNode;
+import parser.nodes.impl.JoinNode;
+import parser.nodes.impl.ProjectionNode;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -46,8 +50,7 @@ public class AQLSyntaxTree {
             public Node build(Element root) {
                 Element base = getElementByName(root, "query");
                 return new FilterNode(
-                        getTextByName(root, "var"),
-                        (ContainerNode)NODE_BUILDER_MAP.get(getTextByName(base, "name")).build(base),
+                        NODE_BUILDER_MAP.get(getTextByName(base, "name")).build(base),
                         new ArithmeticNode(getTextByName(root, "expression"))
                 );
             }
@@ -88,10 +91,8 @@ public class AQLSyntaxTree {
                 Element arg1 = (Element) queries.item(0);
                 Element arg2 = (Element) queries.item(1);
                 return new JoinNode(
-                        getTextByName(root, "var1"),
-                        getTextByName(root, "var2"),
-                        (ContainerNode)NODE_BUILDER_MAP.get(getTextByName(arg1, "name")).build(arg1),
-                        (ContainerNode)NODE_BUILDER_MAP.get(getTextByName(arg2, "name")).build(arg2),
+                        NODE_BUILDER_MAP.get(getTextByName(arg1, "name")).build(arg1),
+                        NODE_BUILDER_MAP.get(getTextByName(arg2, "name")).build(arg2),
                         new ArithmeticNode(getTextByName(root, "expression"))
                 );
             }
@@ -109,8 +110,7 @@ public class AQLSyntaxTree {
                             field.getElementsByTagName("alias").item(0).getTextContent());
                 }
                 return new ProjectionNode(
-                        getTextByName(root, "var"),
-                        (ContainerNode)NODE_BUILDER_MAP.get(getTextByName(base, "name")).build(base),
+                        NODE_BUILDER_MAP.get(getTextByName(base, "name")).build(base),
                         fieldAliases
                 );
             }

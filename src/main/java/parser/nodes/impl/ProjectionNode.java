@@ -1,6 +1,6 @@
 package parser.nodes.impl;
 
-import parser.nodes.ContainerNode;
+import parser.nodes.Node;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -12,16 +12,12 @@ import java.util.Map;
  * Date: 12.02.14
  * Time: 16:50
  */
-public class ProjectionNode extends ContainerNode {
-    private String var;
-    private ContainerNode from;
+public class ProjectionNode extends Node {
     private Map<String, String> fieldAliases;
 
-    public ProjectionNode(String var, ContainerNode from, Map<String, String> fieldAliases) {
-        this.var = var;
-        this.from = from;
+    public ProjectionNode(Node from, Map<String, String> fieldAliases) {
+        super(from, new LinkedList<String>(fieldAliases.values()));
         this.fieldAliases = fieldAliases;
-        this.fieldNames = new LinkedList<String>(fieldAliases.values());
     }
 
     @Override
@@ -29,18 +25,29 @@ public class ProjectionNode extends ContainerNode {
         StringBuilder res = new StringBuilder();
         String shift = shiftRight();
 
-        res.append(String.format("\n%sfor %s in ", shift, var));
+        res.append(String.format("\n%sfor %s in ", shift, getVar()));
 
-        from.setLevel(this.getLevel() + 1);
-        res.append(from.translate());
+        getFrom().setLevel(this.getLevel() + 1);
+        res.append(getFrom().translate());
 
         res.append(String.format("\n%sreturn {\n\t", shift));
 
         for (Iterator<String> iter = fieldAliases.keySet().iterator(); iter.hasNext();) {
             String key = iter.next();
-            res.append(String.format("%s\"%s\":%s.%s", shift, fieldAliases.get(key), var, key));
+            res.append(String.format("%s\"%s\":%s.%s", shift, fieldAliases.get(key), getVar(), key));
             res.append(iter.hasNext() ? ",\n\t" : String.format("\n%s}", shift));
         }
         return res.toString();
+    }
+
+    @Override
+    public String toString() {
+        return "ProjectionNode{" +
+                "level=" + getLevel() +
+                ", var='" + getVar() + '\'' +
+                ", from=" + getFrom() +
+                ", fieldNames=" + getFieldNames() +
+                ", fieldAliases=" + fieldAliases +
+                '}';
     }
 }

@@ -41,8 +41,93 @@
         </query>
     </arguments>
 </query>-->
-
 <query>
+    <operation>
+        <name>join</name>
+        <paramaters>
+            <var1>$f3</var1>
+            <var2>$f2</var2>
+            <expression>$f3.id = $f2.dep_id</expression>
+        </paramaters>
+    </operation>
+    <arguments>
+        <query>
+            <operation>
+                <name>project</name>
+                <paramaters>
+                    <var>$f1</var>
+                    <select>
+                        <field>
+                            <name>department_id</name>
+                            <alias>dep_id</alias>
+                        </field>
+                        <field>
+                            <name>id</name>
+                            <alias>employee_id</alias>
+                        </field>
+                        <field>
+                            <name>name</name>
+                            <alias>Name</alias>
+                        </field>
+                        <field>
+                            <name>age</name>
+                            <alias>Age</alias>
+                        </field>
+                    </select>
+                </paramaters>
+            </operation>
+            <arguments>
+                <query>
+                    <operation>
+                        <name>data</name>
+                        <paramaters>
+                            <source>Employees</source>
+                            <var>$f4</var>
+                        </paramaters>
+                    </operation>
+                </query>
+            </arguments>
+        </query>
+        <query>
+            <operation>
+                <name>project</name>
+                <paramaters>
+                    <var>$f1</var>
+                    <select>
+                        <field>
+                            <name>department_id</name>
+                            <alias>dep_id</alias>
+                        </field>
+                        <field>
+                            <name>id</name>
+                            <alias>employee_id</alias>
+                        </field>
+                        <field>
+                            <name>name</name>
+                            <alias>Name</alias>
+                        </field>
+                        <field>
+                            <name>age</name>
+                            <alias>Age</alias>
+                        </field>
+                    </select>
+                </paramaters>
+            </operation>
+            <arguments>
+                <query>
+                    <operation>
+                        <name>data</name>
+                        <paramaters>
+                            <source>Employees</source>
+                            <var>$f4</var>
+                        </paramaters>
+                    </operation>
+                </query>
+            </arguments>
+        </query>
+    </arguments>
+</query>
+<!--<query>
     <operation>
         <name>project</name>
         <paramaters>
@@ -140,7 +225,7 @@
             </arguments>
         </query>
     </arguments>
-</query>
+</query>-->
 
 <!--
 {       "DataverseName": "Company",

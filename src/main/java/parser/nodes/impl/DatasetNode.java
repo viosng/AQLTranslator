@@ -1,6 +1,6 @@
 package parser.nodes.impl;
 
-import parser.nodes.ContainerNode;
+import parser.nodes.Node;
 
 import java.util.List;
 
@@ -10,13 +10,14 @@ import java.util.List;
  * Date: 30.12.13
  * Time: 8:36
  */
-public class DatasetNode extends ContainerNode {
+public class DatasetNode extends Node {
 
     private String dataset;
 
     public DatasetNode(String dataset, List<String> fieldNames) {
+        super();
+        setFieldNames(fieldNames);
         this.dataset = dataset;
-        this.fieldNames = fieldNames;
     }
 
     public String getDataset() {
@@ -30,5 +31,16 @@ public class DatasetNode extends ContainerNode {
     @Override
     public String translate() {
         return String.format("dataset %s", dataset);
+    }
+
+    @Override
+    public String toString() {
+        return "DatasetNode{" +
+                "level=" + getLevel() +
+                ", var='" + getVar() + '\'' +
+                ", from=" + getFrom() +
+                ", fieldNames=" + getFieldNames() +
+                ", dataset='" + dataset + '\'' +
+                '}';
     }
 }

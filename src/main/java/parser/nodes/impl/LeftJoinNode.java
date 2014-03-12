@@ -1,8 +1,6 @@
 package parser.nodes.impl;
 
-import parser.nodes.ContainerNode;
-
-import java.util.Iterator;
+import parser.expressions.ArithmeticNode;
 
 /**
  * Created with IntelliJ IDEA.
@@ -13,12 +11,12 @@ import java.util.Iterator;
 public class LeftJoinNode extends JoinNode {
 
     public LeftJoinNode(String leftVar, String rightVar, ContainerNode left, ContainerNode right, ArithmeticNode where) {
-        super(leftVar, rightVar, left, right, where);
+        super(left, right, where);
     }
 
     @Override
     public String translate() {
-        StringBuilder res = new StringBuilder();
+        /*StringBuilder res = new StringBuilder();
         String shift = shiftRight();
 
         // make first loop
@@ -48,6 +46,7 @@ public class LeftJoinNode extends JoinNode {
             res.append(String.format("%s\"%s\":%s.%s", shift, field, rightVar, field));
             res.append(iter.hasNext() ? ",\n\t" : String.format("\n%s}", shift));
         }
-        return res.toString();
+        return res.toString();*/
+        return null;
     }
 }

@@ -1,7 +1,6 @@
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import parser.AQLSyntaxTree;
-import parser.XMLParser;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -123,6 +122,7 @@ public class Main {
 
         String query = "use dataverse Company;\n" + tree.translate();
         System.out.println(query);
+
         //System.out.println(getResponse(query.replaceAll("\\t", "")));
     }
 }
