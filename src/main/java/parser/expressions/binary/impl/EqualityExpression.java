@@ -1,7 +1,6 @@
 package parser.expressions.binary.impl;
 
 import parser.expressions.Expression;
-import parser.nodes.Node;
 import parser.expressions.binary.BinaryExpression;
 
 /**

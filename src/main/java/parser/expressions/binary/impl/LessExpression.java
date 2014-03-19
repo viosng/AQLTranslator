@@ -1,7 +1,6 @@
 package parser.expressions.binary.impl;
 
 import parser.expressions.Expression;
-import parser.nodes.Node;
 import parser.expressions.binary.BinaryExpression;
 
 /**
@@ -11,7 +10,7 @@ import parser.expressions.binary.BinaryExpression;
  * Time: 8:38
  */
 public class LessExpression extends BinaryExpression {
-    protected LessExpression(Expression left, Expression right) {
+    public LessExpression(Expression left, Expression right) {
         super(left, right);
     }
 

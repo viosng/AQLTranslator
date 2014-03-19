@@ -11,6 +11,10 @@ import parser.expressions.Expression;
 public class ConstantExpression implements Expression {
     private String constant;
 
+    public ConstantExpression(String constant) {
+        this.constant = constant;
+    }
+
     @Override
     public String translate() {
         return constant;
@@ -19,7 +23,7 @@ public class ConstantExpression implements Expression {
     @Override
     public String toString() {
         return "ConstantExpression{" +
-                "constant='" + constant + '\'' +
+                "constant=" + constant +
                 '}';
     }
 }

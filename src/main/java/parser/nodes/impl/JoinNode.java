@@ -1,6 +1,6 @@
 package parser.nodes.impl;
 
-import parser.expressions.ArithmeticNode;
+import parser.expressions.Expression;
 import parser.nodes.Node;
 
 import java.util.Iterator;
@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class JoinNode extends Node {
     private Node nestedFor;
-    protected ArithmeticNode where;
+    protected Expression where;
 
     private static List<String> mergeLists(List<String> first, List<String> second) {
         List<String> fields = new LinkedList<String>(first);
@@ -23,7 +23,7 @@ public class JoinNode extends Node {
         return fields;
     }
 
-    public JoinNode(Node from, Node nestedFor, ArithmeticNode where) {
+    public JoinNode(Node from, Node nestedFor, Expression where) {
         super(from, mergeLists(from.getFieldNames(), nestedFor.getFieldNames()));
         this.nestedFor = new Node(nestedFor);
         this.where = where;
@@ -49,8 +49,8 @@ public class JoinNode extends Node {
 
         // make return statement with combining field lists of two arguments
         res.append(String.format("\n%sreturn {\n\t", shift));
-        for (Iterator<String> iter = getFrom().getFieldNames().iterator(); iter.hasNext();) {
-            String field = iter.next();
+
+        for (String field : getFrom().getFieldNames()) {
             res.append(String.format("%s\"%s\":%s.%s,\n\t", shift, field, getVar(), field));
         }
 

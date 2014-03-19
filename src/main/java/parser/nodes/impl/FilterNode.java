@@ -1,7 +1,11 @@
 package parser.nodes.impl;
 
-import parser.expressions.binary.BinaryExpression;
+import parser.expressions.Expression;
 import parser.nodes.Node;
+
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -10,11 +14,13 @@ import parser.nodes.Node;
  * Time: 14:12
  */
 public class FilterNode extends Node {
-    private BinaryExpression where;
+    private Expression where;
+    private Map<String, String> fieldAliases;
 
-    public FilterNode(Node from, BinaryExpression where) {
-        super(from);
+    public FilterNode(Node from, Expression where, Map<String, String> fieldAliases) {
+        super(from, new LinkedList<String>(fieldAliases.values()));
         this.where = where;
+        this.fieldAliases = fieldAliases;
     }
 
     @Override
@@ -29,8 +35,14 @@ public class FilterNode extends Node {
 
         res.append(String.format("\n%s\twhere %s", shift, where.translate()));
 
-        res.append(String.format("\n%sreturn %s", shift, getVar()));
-        return res.toString();
+        res.append(String.format("\n%sreturn {\n\t", shift));
+
+        for (Iterator<String> iter = fieldAliases.keySet().iterator(); iter.hasNext();) {
+            String key = iter.next();
+            res.append(String.format("%s\"%s\":%s.%s", shift, fieldAliases.get(key), getVar(), key));
+            res.append(iter.hasNext() ? ",\n\t" : String.format("\n%s}", shift));
+        }
+        return res.toString().replace("{{var}}", getVar());
     }
 
     @Override
@@ -40,6 +52,7 @@ public class FilterNode extends Node {
                 ", var='" + getVar() + '\'' +
                 ", from=" + getFrom() +
                 ", fieldNames=" + getFieldNames() +
+                ", fieldAliases=" + fieldAliases +
                 ", where=" + where +
                 '}';
     }
