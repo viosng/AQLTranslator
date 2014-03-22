@@ -1,7 +1,7 @@
 package parser.nodes.impl;
 
 import parser.expressions.Expression;
-import parser.nodes.Node;
+import parser.nodes.TreeNode;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -13,11 +13,11 @@ import java.util.Map;
  * Date: 14.02.14
  * Time: 14:12
  */
-public class FilterNode extends Node {
+public class FilterTreeNode extends TreeNode {
     private Expression where;
     private Map<String, String> fieldAliases;
 
-    public FilterNode(Node from, Expression where, Map<String, String> fieldAliases) {
+    public FilterTreeNode(TreeNode from, Expression where, Map<String, String> fieldAliases) {
         super(from, new LinkedList<String>(fieldAliases.values()));
         this.where = where;
         this.fieldAliases = fieldAliases;
@@ -47,7 +47,7 @@ public class FilterNode extends Node {
 
     @Override
     public String toString() {
-        return "FilterNode{" +
+        return "FilterTreeNode{" +
                 "level=" + getLevel() +
                 ", var='" + getVar() + '\'' +
                 ", from=" + getFrom() +

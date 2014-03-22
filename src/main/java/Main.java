@@ -118,7 +118,7 @@ public class Main {
 
         doc.getDocumentElement().normalize();
 
-        AQLSyntaxTree tree = new AQLSyntaxTree((Element)doc.getDocumentElement());
+        AQLSyntaxTree tree = new AQLSyntaxTree(new AQLSyntaxTree.MyXMLElement((Element)doc.getDocumentElement()));
 
         String query = "use dataverse Company;\n" + tree.translate();
         System.out.println(query);

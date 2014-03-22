@@ -1,53 +1,82 @@
 <?xml version="1.0"?>
 
 <query>
-    <operation>
-        <name>filter</name>
-        <paramaters>
-            <select>
-                <field>
-                    <name>department_id</name>
-                    <alias>dep_id</alias>
-                </field>
-                <field>
-                    <name>id</name>
-                    <alias>employee_id</alias>
-                </field>
-                <field>
-                    <name>name</name>
-                    <alias>Name</alias>
-                </field>
-                <field>
-                    <name>age</name>
-                    <alias>Age</alias>
-                </field>
-            </select>
+<operation>
+    <name>join</name>
+    <paramaters>
+        <expression>
+            <name>equal</name>
             <expression>
-                <name>less</name>
-                <expression>
-                    <name>field_access</name>
-                    <scope>1</scope>
-                    <arg>age</arg>
-                </expression>
-                <expression>
-                    <name>constant</name>
-                    <arg>30</arg>
-                </expression>
+                <name>field_access</name>
+                <arg>department_id</arg>
+                <scope>1</scope>
             </expression>
-        </paramaters>
-    </operation>
-    <arguments>
-        <query>
-            <operation>
-                <name>data</name>
-                <paramaters>
-                    <source>Employees</source>
-                </paramaters>
-            </operation>
-        </query>
-    </arguments>
+            <expression>
+                <name>field_access</name>
+                <arg>id</arg>
+                <scope>2</scope>
+            </expression>
+        </expression>
+    </paramaters>
+</operation>
+<arguments>
+    <query>
+        <operation>
+            <name>filter</name>
+            <paramaters>
+                <select>
+                    <field>
+                        <name>department_id</name>
+                        <alias>dep_id</alias>
+                    </field>
+                    <field>
+                        <name>id</name>
+                        <alias>employee_id</alias>
+                    </field>
+                    <field>
+                        <name>name</name>
+                        <alias>Name</alias>
+                    </field>
+                    <field>
+                        <name>age</name>
+                        <alias>Age</alias>
+                    </field>
+                </select>
+                <expression>
+                    <name>less</name>
+                    <expression>
+                        <name>field_access</name>
+                        <arg>age</arg>
+                        <scope>1</scope>
+                    </expression>
+                    <expression>
+                        <name>constant</name>
+                        <arg>30</arg>
+                    </expression>
+                </expression>
+            </paramaters>
+        </operation>
+        <arguments>
+            <query>
+                <operation>
+                    <name>data</name>
+                    <paramaters>
+                        <source>Employees</source>
+                    </paramaters>
+                </operation>
+            </query>
+        </arguments>
+    </query>
+    <query>
+        <operation>
+            <name>data</name>
+            <paramaters>
+                <source>Departments</source>
+            </paramaters>
+        </operation>
+    </query>
+</arguments>
 </query>
-
 
 <!--<query>
     <operation>

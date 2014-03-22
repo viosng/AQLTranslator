@@ -1,7 +1,7 @@
 package parser.nodes.impl;
 
 import parser.expressions.Expression;
-import parser.nodes.Node;
+import parser.nodes.TreeNode;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -13,8 +13,8 @@ import java.util.List;
  * Date: 03.03.14
  * Time: 9:22
  */
-public class JoinNode extends Node {
-    private Node nestedFor;
+public class JoinTreeNode extends TreeNode {
+    private TreeNode nestedFor;
     protected Expression where;
 
     private static List<String> mergeLists(List<String> first, List<String> second) {
@@ -23,9 +23,9 @@ public class JoinNode extends Node {
         return fields;
     }
 
-    public JoinNode(Node from, Node nestedFor, Expression where) {
+    public JoinTreeNode(TreeNode from, TreeNode nestedFor, Expression where) {
         super(from, mergeLists(from.getFieldNames(), nestedFor.getFieldNames()));
-        this.nestedFor = new Node(nestedFor);
+        this.nestedFor = new TreeNode(nestedFor);
         this.where = where;
     }
 
@@ -64,7 +64,7 @@ public class JoinNode extends Node {
 
     @Override
     public String toString() {
-        return "JoinNode{" +
+        return "JoinTreeNode{" +
                 "level=" + getLevel() +
                 ", var='" + getVar() + '\'' +
                 ", from=" + getFrom() +

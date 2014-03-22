@@ -10,7 +10,7 @@ import java.util.List;
  * Date: 30.12.13
  * Time: 8:04
  */
-public class Node implements Translatable {
+public class TreeNode implements Translatable {
     private static int varNumber = 0;
 
     public static String getNextVar() {
@@ -19,22 +19,22 @@ public class Node implements Translatable {
 
     private int level = 0;
     private String var;
-    private Node from;
+    private TreeNode from;
     private List<String> fieldNames;
 
-    public Node(Node from, List<String> fieldNames) {
+    public TreeNode(TreeNode from, List<String> fieldNames) {
         this.var = getNextVar();
         this.from = from;
         this.fieldNames = fieldNames;
     }
 
-    public Node(Node from) {
+    public TreeNode(TreeNode from) {
         this.var = getNextVar();
         this.from = from;
         this.fieldNames = from.getFieldNames();
     }
 
-    public Node() {
+    public TreeNode() {
     }
 
     public List<String> getFieldNames() {
@@ -49,7 +49,7 @@ public class Node implements Translatable {
         this.fieldNames = fieldNames;
     }
 
-    public Node getFrom() {
+    public TreeNode getFrom() {
         return from;
     }
 
@@ -85,7 +85,7 @@ public class Node implements Translatable {
 
     @Override
     public String toString() {
-        return "Node{" +
+        return "TreeNode{" +
                 "level=" + level +
                 ", var='" + var + '\'' +
                 ", from=" + from +

@@ -1,6 +1,6 @@
 package parser.nodes.impl;
 
-import parser.nodes.Node;
+import parser.nodes.TreeNode;
 
 import java.util.List;
 
@@ -10,11 +10,11 @@ import java.util.List;
  * Date: 30.12.13
  * Time: 8:36
  */
-public class DatasetNode extends Node {
+public class DatasetTreeNode extends TreeNode {
 
     private String dataset;
 
-    public DatasetNode(String dataset, List<String> fieldNames) {
+    public DatasetTreeNode(String dataset, List<String> fieldNames) {
         super();
         setFieldNames(fieldNames);
         this.dataset = dataset;
@@ -35,7 +35,7 @@ public class DatasetNode extends Node {
 
     @Override
     public String toString() {
-        return "DatasetNode{" +
+        return "DatasetTreeNode{" +
                 "level=" + getLevel() +
                 ", var='" + getVar() + '\'' +
                 ", from=" + getFrom() +
