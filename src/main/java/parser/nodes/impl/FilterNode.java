@@ -42,7 +42,7 @@ public class FilterNode extends Node {
             res.append(String.format("%s\"%s\":%s.%s", shift, fieldAliases.get(key), getVar(), key));
             res.append(iter.hasNext() ? ",\n\t" : String.format("\n%s}", shift));
         }
-        return res.toString().replace("{{var}}", getVar());
+        return res.toString().replace("{{var1}}", getVar());
     }
 
     @Override

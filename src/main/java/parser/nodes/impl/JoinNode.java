@@ -59,7 +59,7 @@ public class JoinNode extends Node {
             res.append(String.format("%s\"%s\":%s.%s", shift, field, nestedFor.getVar(), field));
             res.append(iter.hasNext() ? ",\n\t" : String.format("\n%s}", shift));
         }
-        return res.toString();
+        return res.toString().replace("{{var1}}", getVar()).replace("{{var2}}", nestedFor.getVar());
     }
 
     @Override

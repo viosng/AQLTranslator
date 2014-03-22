@@ -140,7 +140,7 @@ public class AQLSyntaxTree {
         EXPRESSION_BUILDER_MAP.put("field_access", new ExpressionBuilder() {
             @Override
             public Expression build(Element root) {
-                return new FieldAccessorExpression(getTextByName(root, "arg"));
+                return new FieldAccessorExpression(getTextByName(root, "arg"), getTextByName(root, "scope"));
             }
         });
 

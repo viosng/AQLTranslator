@@ -26,6 +26,7 @@
                 <name>less</name>
                 <expression>
                     <name>field_access</name>
+                    <scope>1</scope>
                     <arg>age</arg>
                 </expression>
                 <expression>
