@@ -1,6 +1,7 @@
-package parser.expressions.unary;
+package parser.expressions.unary.impl;
 
-import parser.expressions.Expression;
+import parser.expressions.Difficulty;
+import parser.expressions.unary.UnaryExpression;
 
 /**
  * Created with IntelliJ IDEA.
@@ -8,7 +9,7 @@ import parser.expressions.Expression;
  * Date: 02.03.14
  * Time: 12:14
  */
-public class FieldAccessorExpression implements Expression {
+public class FieldAccessorExpression implements UnaryExpression {
     private String field, scope;
 
 
@@ -23,10 +24,20 @@ public class FieldAccessorExpression implements Expression {
     }
 
     @Override
+    public double getExecutionTime() {
+        return 0;
+    }
+
+    @Override
     public String toString() {
         return "FieldAccessorExpression{" +
                 "field='" + field + '\'' +
                 ", scope='" + scope + '\'' +
                 '}';
+    }
+
+    @Override
+    public Difficulty getDifficulty() {
+        return Difficulty.HASH;
     }
 }

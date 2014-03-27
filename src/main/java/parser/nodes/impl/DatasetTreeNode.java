@@ -14,9 +14,8 @@ public class DatasetTreeNode extends TreeNode {
 
     private String dataset;
 
-    public DatasetTreeNode(String dataset, List<String> fieldNames) {
-        super();
-        setFieldNames(fieldNames);
+    public DatasetTreeNode(String dataset, List<Field> fieldNames, int size) {
+        super(fieldNames, size);
         this.dataset = dataset;
     }
 
@@ -41,6 +40,13 @@ public class DatasetTreeNode extends TreeNode {
                 ", from=" + getFrom() +
                 ", fieldNames=" + getFieldNames() +
                 ", dataset='" + dataset + '\'' +
+                ", size=" + getVolume() +
                 '}';
     }
+
+    @Override
+    public double getExecutionTime() {
+        return Math.ceil(getVolume() * VOLUME_TO_BLOCK)  * BLOCK_ACCESS_TIME;
+    }
+
 }

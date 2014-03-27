@@ -1,20 +1,23 @@
 package parser;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import parser.expressions.Expression;
 import parser.expressions.binary.impl.EqualityExpression;
 import parser.expressions.binary.impl.LessExpression;
-import parser.expressions.unary.ConstantExpression;
-import parser.expressions.unary.FieldAccessorExpression;
+import parser.expressions.unary.impl.ConstantExpression;
+import parser.expressions.unary.impl.FieldAccessorExpression;
 import parser.nodes.TreeNode;
 import parser.nodes.impl.DatasetTreeNode;
 import parser.nodes.impl.FilterTreeNode;
 import parser.nodes.impl.JoinTreeNode;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,7 +26,7 @@ import java.util.Map;
  * Date: 14.02.14
  * Time: 13:49
  */
-public class AQLSyntaxTree {
+public class AQLSyntaxTree implements Translatable{
 
     public static class MyXMLElement {
         private Element element;
@@ -64,14 +67,32 @@ public class AQLSyntaxTree {
         }
     }
 
-    private Translatable root;
+    public static class ArrayWrapper {
+        private List<TreeNode.Field> results;
 
-    public AQLSyntaxTree(MyXMLElement root) {
-        this.root = parse(root);
+        public ArrayWrapper(List<TreeNode.Field> results) {
+            this.results = results;
+        }
+
+        public List<TreeNode.Field> getResults() {
+            return results;
+        }
+
+        public void setResults(List<TreeNode.Field> results) {
+            this.results = results;
+        }
+    }
+
+    private Translatable root;
+    private AsterixConnector connector;
+
+    public AQLSyntaxTree(AsterixConnector connector, MyXMLElement root) {
+        this.connector = connector;
+        this.root = parse(connector, root);
     }
 
     private static interface NodeBuilder {
-        public TreeNode build(MyXMLElement root);
+        public TreeNode build(AsterixConnector connector, MyXMLElement root);
     }
 
     private static interface ExpressionBuilder {
@@ -96,7 +117,7 @@ public class AQLSyntaxTree {
 
         NODE_BUILDER_MAP.put("filter", new NodeBuilder() {
             @Override
-            public TreeNode build(MyXMLElement root) {
+            public TreeNode build(AsterixConnector connector, MyXMLElement root) {
                 MyXMLElement operation = root.getFirstChildElement();
                 MyXMLElement base = operation.getNextSiblingElement().getFirstChildElement();
                 MyXMLElement select = operation.getFirstChildElement().getNextSiblingElement().getFirstChildElement();
@@ -108,7 +129,7 @@ public class AQLSyntaxTree {
                     fieldAliases.put(getTextByName(field, "name"), getTextByName(field, "alias"));
                 }
                 return new FilterTreeNode(
-                        NODE_BUILDER_MAP.get(base.getOperationName()).build(base),
+                        NODE_BUILDER_MAP.get(base.getOperationName()).build(connector, base),
                         EXPRESSION_BUILDER_MAP.get(expr.getExpressionName()).build(expr),
                         fieldAliases
                 );
@@ -117,45 +138,47 @@ public class AQLSyntaxTree {
 
         NODE_BUILDER_MAP.put("data", new NodeBuilder() {
             @Override
-            public TreeNode build(MyXMLElement root) {
-                /*String source = root.getElementsByTagName("source").item(0).getTextContent();
-                String query = String.format("for $a in(\n" +
-                        "    for $r in dataset Metadata.Datatype\n" +
-                        "        for $s in dataset Metadata.Dataset\n" +
-                        "            where $s.DatasetName=\"%s\" and $r.DatatypeName =  $s.DataTypeName\n" +
-                        "    return $r.Derived.Record.Fields)\n" +
-                        "    for $b in $a\n" +
-                        "return $b.FieldName;", source);
-                System.out.println(query);
-                try {
-                    String response = Main.getResponse(query).get(0);
-                    List<String> names = Arrays.asList(response.substring(response.indexOf(':') + 2, response.length() - 2)
-                            .replaceAll("\\\\n", "").replaceAll("\"", "").replaceAll("\\\\", "").split(","));
-                    return new DatasetTreeNode(getTextByName(root, "source"), Arrays.asList("name", "age","id", "department_id"));
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return null;*/
-                return new DatasetTreeNode(root
+            public TreeNode build(AsterixConnector connector, MyXMLElement root) {
+                String source = root
                         .getFirstChildElement()
                         .getFirstChildElement()
                         .getNextSiblingElement()
                         .getFirstChildElement()
-                        .getText(), Arrays.asList("name", "age","id", "department_id"));
+                        .getText();
+                ObjectMapper mapper = new ObjectMapper();
+                String query = String.format("use dataverse Test;for $a in(for $r in dataset Metadata.Datatype\n" +
+                        " for $s in dataset Metadata.Dataset\n" +
+                        " where $s.DatasetName=\"%s\" and $r.DatatypeName =  $s.DataTypeName\n" +
+                        "return $r.Derived.Record.Fields)\n" +
+                        "for $b in $a\n" +
+                        "return $b;", source);
+                List<TreeNode.Field> fields = new ArrayList<TreeNode.Field>();
+                int size = 0;
+                try {
+                    String response = connector.getResponse(query).replace("FieldName", "name").replace("FieldType", "type");
+                    response = response.substring(response.indexOf('['), response.lastIndexOf(']') + 1);
+                    fields = mapper.readValue(response, new TypeReference<List<TreeNode.Field>>(){});
+                    response = connector.getResponse(String.format(
+                            "use dataverse Test;count(for $fbu in dataset %s return $fbu);", source));
+                    response = response.substring(response.indexOf('[') + 2, response.indexOf('i'));
+                    size = Integer.parseInt(response);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return new DatasetTreeNode(source, fields, size);
             }
         });
 
         NODE_BUILDER_MAP.put("join", new NodeBuilder() {
             @Override
-            public TreeNode build(MyXMLElement root) {
+            public TreeNode build(AsterixConnector connector, MyXMLElement root) {
                 MyXMLElement operation = root.getFirstChildElement();
                 MyXMLElement arg1 = operation.getNextSiblingElement().getFirstChildElement();
                 MyXMLElement arg2 = arg1.getNextSiblingElement();
                 MyXMLElement expr = operation.getFirstChildElement().getNextSiblingElement().getFirstChildElement();
                 return new JoinTreeNode(
-                        NODE_BUILDER_MAP.get(arg1.getOperationName()).build(arg1),
-                        NODE_BUILDER_MAP.get(arg2.getOperationName()).build(arg2),
+                        NODE_BUILDER_MAP.get(arg1.getOperationName()).build(connector, arg1),
+                        NODE_BUILDER_MAP.get(arg2.getOperationName()).build(connector, arg2),
                         EXPRESSION_BUILDER_MAP.get(expr.getFirstChildElement().getText()).build(expr)
                 );
             }
@@ -203,8 +226,8 @@ public class AQLSyntaxTree {
 
     }
 
-    public static TreeNode parse(MyXMLElement root) {
-        return NODE_BUILDER_MAP.get(root.getOperationName()).build(root);
+    public static TreeNode parse(AsterixConnector connector, MyXMLElement root) {
+        return NODE_BUILDER_MAP.get(root.getOperationName()).build(connector, root);
     }
 
     public static void print(Element root) {
@@ -218,7 +241,15 @@ public class AQLSyntaxTree {
         }
     }
 
+    @Override
     public String translate() {
         return root.translate();
     }
+
+    @Override
+    public double getExecutionTime() {
+        return root.getExecutionTime();
+    }
+
+
 }

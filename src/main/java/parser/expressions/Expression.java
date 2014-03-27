@@ -9,4 +9,5 @@ import parser.Translatable;
  * Time: 8:41
  */
 public interface Expression extends Translatable {
+    public Difficulty getDifficulty();
 }

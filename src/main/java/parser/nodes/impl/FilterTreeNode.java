@@ -3,8 +3,9 @@ package parser.nodes.impl;
 import parser.expressions.Expression;
 import parser.nodes.TreeNode;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,8 +18,23 @@ public class FilterTreeNode extends TreeNode {
     private Expression where;
     private Map<String, String> fieldAliases;
 
+    private static List<Field> getNewFields(TreeNode from, Map<String, String> fieldAliases) {
+        if(fieldAliases.size() == 0) return from.getFieldNames();
+        List<Field> newFields = new ArrayList<Field>();
+        for(Field field : from.getFieldNames()) {
+            for(String alias : fieldAliases.keySet()) {
+                if (field.getName().equals(alias)) {
+                    field.setName(fieldAliases.get(alias));
+                    newFields.add(field);
+                    break;
+                }
+            }
+        }
+        return newFields;
+    }
+
     public FilterTreeNode(TreeNode from, Expression where, Map<String, String> fieldAliases) {
-        super(from, new LinkedList<String>(fieldAliases.values()));
+        super(from, getNewFields(from, fieldAliases));
         this.where = where;
         this.fieldAliases = fieldAliases;
     }
@@ -35,7 +51,7 @@ public class FilterTreeNode extends TreeNode {
 
         res.append(String.format("\n%s\twhere %s", shift, where.translate()));
 
-        res.append(String.format("\n%sreturn {\n\t", shift));
+        res.append(String.format("\n%sreturn %s", shift, (fieldAliases.size() > 0 ? "{\n\t" : getVar())));
 
         for (Iterator<String> iter = fieldAliases.keySet().iterator(); iter.hasNext();) {
             String key = iter.next();

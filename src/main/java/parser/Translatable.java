@@ -9,4 +9,6 @@ package parser;
 public interface Translatable {
 
     public String translate();
+
+    public double getExecutionTime();
 }
